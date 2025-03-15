@@ -6,16 +6,25 @@
   "action": {
     "default_popup": "index.html"
   },
-  "host_permissions": [
-    "*://*.youtube.com/*"
-  ],
+  "host_permissions": ["<all_urls>"],
   "background": {
     "service_worker": "background.js"
   },
+  "content_scripts": [
+    {
+      "matches": [
+        "<all_urls>"
+      ], 
+      "js": ["content.js"],
+      "run_at": "document_start"
+    }
+  ],
   "permissions": [
     "storage",
     "scripting",
-    "cookies"
+    "cookies",
+    "activeTab",
+    "tabs"
   ],
   "icons": {
     "16": "coffecup.png",  

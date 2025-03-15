@@ -14,6 +14,10 @@ export default defineConfig({
           dest: '.',
         },
         {
+          src: 'src/background/content.js',
+          dest: '.',
+        },
+        {
           src: 'src/background/background.js',
           dest: '.',
         },

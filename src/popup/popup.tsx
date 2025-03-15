@@ -1,10 +1,31 @@
+import { useAuth } from "../auth/authprovider";
 import { formatTime } from "../time/formatTime";
 import { useTimer } from "../time/useTimer";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 function Popup() {
   const { state, handleStart, handleStop, setTargetTimeMinutes } = useTimer();
   const [showWarning, setShowWarning] = useState(false);
+  const { user } = useAuth();
+
+  const [clickCount, setClickCount] = useState(0);
+  const [wordCount, setWordCount] = useState(0);
+
+  useEffect(() => {
+    const fetchStats = () => {
+      chrome.storage.local.get(["clickCount", "wordCount"], (data) => {
+        setClickCount(data.clickCount || 0);
+        setWordCount(data.wordCount || 0);
+      });
+    };
+
+    if (state.running) {
+      fetchStats(); 
+      const interval = setInterval(fetchStats, 1000);
+
+      return () => clearInterval(interval);
+    }
+  }, [state.running]);
 
   const handleIncrement = () => {
     setTargetTimeMinutes(state.targetTimeMinutes + 5);
@@ -30,13 +51,20 @@ function Popup() {
   };
 
   return (
-    <div className="w-80 h-96 bg-[#492e16] p-4 flex flex-col items-center justify-between relative">
-      <img src="logo.png" className="mb-4 w-30 mx-auto" alt="Logo" />
+    <div className="w-96 h-[28rem] bg-[#492e16] p-4 flex flex-col items-center justify-between relative">
+      <img src="logo.png" className="w-34 mx-auto" alt="Logo" />
+
+      <div className="bg-[#3a2312] px-3 py-1 rounded-md shadow-md">
+        <p className="text-white text-xs font-semibold">
+          {user ? `👤 ${user}` : "Guest"}
+        </p>
+      </div>
+
       <p className="text-white text-lg text-center">
         Click the coffee to {state.running ? "stop" : "start"} brewing!
       </p>
 
-      <div className="relative w-46 h-48">
+      <div className="relative w-36 h-36">
         <img
           src="coffecup.png"
           alt="Coffee Cup"
@@ -60,9 +88,20 @@ function Popup() {
       )}
 
       {state.running && (
-        <p className="text-white text-6xl font-bold">
-          {formatTime(state.timer)}
-        </p>
+        <>
+          <p className="text-white text-6xl font-bold">
+            {formatTime(state.timer)}
+          </p>
+
+          <div className="bg-[#3a2312] p-2 mt-4 w-full rounded-lg text-center text-white">
+            <p>
+              Mouse Clicks: <span className="font-bold">{clickCount}</span>
+            </p>
+            <p>
+              Words Typed: <span className="font-bold">{wordCount}</span>
+            </p>
+          </div>
+        </>
       )}
 
       {showWarning && (

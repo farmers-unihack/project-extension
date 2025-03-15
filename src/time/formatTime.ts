@@ -10,11 +10,3 @@ export const formatTime = (milliseconds: number) => {
     .padStart(2, "0")}`;
 };
 
-export const calculateColorsTime = (duration: number) => {
-  const quarter = duration / 4;
-  const half = duration / 2;
-  const twoThirds = (duration * 2) / 3;
-
-  return [quarter, half, twoThirds, 0];
-};
-
