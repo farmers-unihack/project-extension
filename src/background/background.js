@@ -44,6 +44,8 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
       running: false,
       block: false,
     });
+
+    
   } 
   else if (message.action === "trackWord") {
     chrome.storage.local.get(["wordCount"], (data) => {

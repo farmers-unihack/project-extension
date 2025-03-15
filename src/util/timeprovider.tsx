@@ -135,7 +135,7 @@ export const TimeProvider: React.FC<TimeProviderProps> = ({ children }) => {
         running: true,
       });
 
-      clockOut();
+      
     }
   };
 
@@ -149,6 +149,8 @@ export const TimeProvider: React.FC<TimeProviderProps> = ({ children }) => {
       targetTimeMinutes: 0,
       timer: 0,
     });
+
+    clockOut();
   };
 
   const handleReset = () => {
