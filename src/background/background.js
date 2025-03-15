@@ -14,6 +14,7 @@ chrome.runtime.onInstalled.addListener(() => {
     block: false,
     clickCount: 0,
     wordCount: 0,
+    blockedURLS: [],
   });
 });
 

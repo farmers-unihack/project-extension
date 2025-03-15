@@ -1,4 +1,6 @@
-import { useEffect, useState } from "react";
+import { createContext, ReactNode, useContext, useEffect, useState } from "react";
+import { useAuth } from "../components/auth/authprovider";
+
 
 interface TimerState {
   startTime: number | null;
@@ -8,15 +10,38 @@ interface TimerState {
   timer: number;
 }
 
+interface TimerContextProps {
+  state: TimerState;
+  handleStart: () => void;
+  handleStop: () => void;
+  handleReset: () => void;
+  setTargetTimeMinutes: (minutes: number) => void;
+}
 
-export const useTimer = () => {
-  const [state, setState] = useState<TimerState>({
+interface TimeProviderProps {
+  children: ReactNode;
+}
+
+const TimerContext = createContext<TimerContextProps | undefined>(undefined);
+
+export const useTimerContext = () => {
+  const context = useContext(TimerContext);
+  if (!context) {
+    throw new Error("useTimerContext must be used within a TimerProvider");
+  }
+  return context;
+};
+
+export const TimeProvider: React.FC<TimeProviderProps> = ({ children }) => {
+    const [state, setState] = useState<TimerState>({
     startTime: null,
     endTime: null,
     running: false,
     targetTimeMinutes: 0,
     timer: 0,
   });
+
+  const {clockOut} = useAuth();
 
   useEffect(() => {
     chrome.storage.local.get(
@@ -110,6 +135,7 @@ export const useTimer = () => {
         running: true,
       });
 
+      clockOut();
     }
   };
 
@@ -123,7 +149,6 @@ export const useTimer = () => {
       targetTimeMinutes: 0,
       timer: 0,
     });
-
   };
 
   const handleReset = () => {
@@ -155,11 +180,17 @@ export const useTimer = () => {
     }));
   };
 
-  return {
-    state,
-    handleStart,
-    handleStop,
-    handleReset,
-    setTargetTimeMinutes,
-  };
+  return (
+    <TimerContext.Provider
+      value={{
+        state,
+        handleStart,
+        handleStop,
+        handleReset,
+        setTargetTimeMinutes,
+      }}
+    >
+      {children}
+    </TimerContext.Provider>
+  );
 };

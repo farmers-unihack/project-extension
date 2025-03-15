@@ -70,20 +70,37 @@ function detectGoogleDocsTyping() {
 
 setTimeout(detectGoogleDocsTyping, 2000);
 
-findAllURL = function changeAllURL(text) {
+findAllURL = function changeAllURL() {
   var current = window.location.href;
-  if (current.startsWith(text)) {
-    if (document.body) {
-      updateOverlay(true);
-    } else {
-      document.addEventListener("DOMContentLoaded", () => updateOverlay(true));
+  chrome.storage.local.get("blockedURLs", ({ blockedURLs }) => {
+    blockedURLs = blockedURLs || [];
+
+    let normalizedCurrent = current.replace(/^https?:\/\//, "");
+    normalizedCurrent = normalizedCurrent.replace(/^www\./, "");
+
+    if (
+      blockedURLs.some((url) => {
+        let normalizedUrl = url
+          .replace(/^https?:\/\//, "")
+          .replace(/^www\./, "");
+        return normalizedCurrent.includes(normalizedUrl);
+      })
+    ) {
+      if (document.body) {
+        updateOverlay(true);
+      }
+       else {
+        document.addEventListener("DOMContentLoaded", () =>
+          updateOverlay(true)
+        );
+      }
     }
-  }
+  });
 };
 
 chrome.storage.local.get("running", ({ running }) => {
   if (running) {
-    findAllURL("https://www.youtube.com/");
+    findAllURL();
   }
 });
 

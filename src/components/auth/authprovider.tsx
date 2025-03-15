@@ -13,7 +13,6 @@ interface GroupInfo {
   collectibles: any[] | null;
 }
 
-
 interface AuthContextType {
   user: string | null;
   group: string | null;
@@ -27,7 +26,7 @@ interface AuthContextType {
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 const api = axios.create({
-  baseURL: process.env.REACT_APP_API_URL,
+  baseURL: "https://api.dejabrew.live/api",
 });
 
 api.interceptors.request.use(
@@ -88,6 +87,8 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
       const response = await api.post("/auth/login", { username, password });
 
       if (response.status === 201 && response.data.token) {
+
+        console.log(response.data);
         localStorage.setItem("token", response.data.token);
         localStorage.setItem("username", username);
 
@@ -126,7 +127,10 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
 
   const clockOut = async () => {
     try {
-      const response = await api.post("/user/clockout");
+      let clickCount = chrome.storage.local.get(["clickCount"]);
+      let wordCount = chrome.storage.local.get(["wordCount"]);
+
+      const response = await api.post("/user/clockout", {clickCount, wordCount});
       if (response.status === 200) {
         return response.data.msg;
       }

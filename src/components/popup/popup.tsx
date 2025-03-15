@@ -1,11 +1,13 @@
 import { useAuth } from "../auth/authprovider";
 import { formatTime } from "../../util/formatTime";
-import { useTimer } from "../../util/useTimer";
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { useTimerContext } from "../../util/timeprovider";
+
 
 function Popup() {
-  const { state, handleStart, handleStop, setTargetTimeMinutes } = useTimer();
+  
+  const { state, handleStart, handleStop, setTargetTimeMinutes } = useTimerContext();
   const [showWarning, setShowWarning] = useState(false);
   const { user, group, clockIn, clockOut } = useAuth();
 
@@ -57,28 +59,42 @@ function Popup() {
   const handleClockIn = () => {
     handleStart();
     clockIn();
-  }
+  };
 
   const handleGroupClick = () => {
-    navigate("/view-group"); 
+    navigate("/view-group");
+  };
+
+  const handleBlocklist = () => {
+    navigate("/blocklist");
   };
 
   return (
     <div className="w-96 h-[28rem] bg-[#492e16] p-4 flex flex-col items-center justify-between relative">
       <img src="logo.png" className="w-34 mx-auto" alt="Logo" />
 
-      <div className="flex space-x-7">
+      <div className="flex space-x-7 w-full">
         <div className="bg-[#3a2312] px-3 py-1 rounded-md shadow-md flex-1">
           <p className="text-white text-xs font-semibold">
             {user ? `👤 ${user}` : "Guest"}
           </p>
         </div>
 
-        <div className="bg-[#3a2312] px-3 py-1 rounded-md shadow-md flex-1 hover:cursor-pointer" onClick={handleGroupClick}>
+        <div
+          className="bg-[#3a2312] px-3 py-1 rounded-md shadow-md flex-1 hover:cursor-pointer"
+          onClick={handleGroupClick}
+        >
           <p className="text-white text-xs font-semibold">
             {group ? `👤 ${group}` : "No Group"}
           </p>
         </div>
+      </div>
+
+      <div
+        className="bg-[#BDB395] px-3 py-1 rounded-md shadow-md hover:cursor-pointer"
+        onClick={handleBlocklist}
+      >
+        <p className="text-white text-xs font-semibold">Blocklist</p>
       </div>
 
       <p className="text-white text-lg text-center">
