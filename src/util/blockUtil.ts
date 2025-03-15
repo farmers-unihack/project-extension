@@ -1,93 +1,9 @@
-let clickCount = 0;
-let wordCount = 0;
-setInterval(function () {
-  console.log(clickCount);
-}, 100);
-
-document.addEventListener("click", () => {
-  chrome.runtime.sendMessage({ action: "trackClick", clickCount });
-  clickCount++;
-});
-
-let buffer = "";
-
-document.addEventListener("keydown", (event) => {
-  if (event.key.length === 1 && /\w/.test(event.key)) {
-    buffer += event.key;
-  } else if (
-    event.key === " " ||
-    event.key === "Enter" ||
-    /[\.,!?;:]/.test(event.key)
-  ) {
-    if (buffer.trim().length > 0) {
-      console.log("Word detected:", buffer);
-      chrome.runtime.sendMessage({ action: "trackWord", wordCount });
-      wordCount++;
-    }
-    buffer = "";
-  }
-});
-
-let iframeWords = new Map();
-
-function detectGoogleDocsTyping() {
-  let iframes = document.querySelectorAll("iframe");
-
-  iframes.forEach((iframe) => {
-    try {
-      if (iframe.contentDocument) {
-        if (!iframeWords.has(iframe)) {
-          iframeWords.set(iframe, "");
-        }
-
-        iframe.contentDocument.addEventListener("keydown", (e) => {
-          let buffer = iframeWords.get(iframe);
-
-          if (e.key.length === 1 && /\w/.test(e.key)) {
-            buffer += e.key;
-          } else if (
-            e.key === " " ||
-            e.key === "Enter" ||
-            /[\.,!?;:]/.test(e.key)
-          ) {
-            if (buffer.trim().length > 0) {
-              console.log("word detected:", buffer);
-              chrome.runtime.sendMessage({ action: "trackWord", wordCount });
-              wordCount++;
-            }
-
-            buffer = "";
-          }
-
-          iframeWords.set(iframe, buffer);
-        });
-      }
-    } catch (error) {
-      console.log("Cant access iframe");
-    }
-  });
+interface Tab {
+  id?: number;
+  url?: string;
 }
 
-setTimeout(detectGoogleDocsTyping, 2000);
-
-findAllURL = function changeAllURL(text) {
-  var current = window.location.href;
-  if (current.startsWith(text)) {
-    if (document.body) {
-      updateOverlay(true);
-    } else {
-      document.addEventListener("DOMContentLoaded", () => updateOverlay(true));
-    }
-  }
-};
-
-chrome.storage.local.get("running", ({ running }) => {
-  if (running) {
-    findAllURL("https://www.youtube.com/");
-  }
-});
-
-function updateOverlay(isBlocking) {
+export function updateOverlay(isBlocking: boolean) {
   let overlay = document.getElementById("blocking-overlay");
   if (isBlocking) {
     if (!overlay) {
@@ -176,5 +92,29 @@ function updateOverlay(isBlocking) {
 
     document.documentElement.style.overflow = "";
     document.body.style.overflow = "";
+  }
+}
+
+export async function updateAllTabs(isBlocking: boolean): Promise<void> {
+  try {
+    const tabs: Tab[] = await chrome.tabs.query({});
+
+    tabs.forEach(async (tab) => {
+      if (tab.url && tab.url.includes("youtube.com")) {
+        try {
+          if (tab.id !== undefined) {
+            await chrome.scripting.executeScript({
+              target: { tabId: tab.id },
+              func: updateOverlay,
+              args: [isBlocking],
+            });
+          }
+        } catch (err) {
+          console.error("Error updating content script:", err);
+        }
+      }
+    });
+  } catch (error) {
+    console.error("Error querying tabs:", error);
   }
 }

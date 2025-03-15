@@ -1,15 +1,18 @@
 import { useAuth } from "../auth/authprovider";
-import { formatTime } from "../time/formatTime";
-import { useTimer } from "../time/useTimer";
+import { formatTime } from "../../util/formatTime";
+import { useTimer } from "../../util/useTimer";
 import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 
 function Popup() {
   const { state, handleStart, handleStop, setTargetTimeMinutes } = useTimer();
   const [showWarning, setShowWarning] = useState(false);
-  const { user } = useAuth();
+  const { user, group, clockIn, clockOut } = useAuth();
 
   const [clickCount, setClickCount] = useState(0);
   const [wordCount, setWordCount] = useState(0);
+
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchStats = () => {
@@ -20,7 +23,7 @@ function Popup() {
     };
 
     if (state.running) {
-      fetchStats(); 
+      fetchStats();
       const interval = setInterval(fetchStats, 1000);
 
       return () => clearInterval(interval);
@@ -44,20 +47,38 @@ function Popup() {
   const confirmStop = () => {
     handleStop();
     setShowWarning(false);
+    clockOut();
   };
 
   const cancelStop = () => {
     setShowWarning(false);
   };
 
+  const handleClockIn = () => {
+    handleStart();
+    clockIn();
+  }
+
+  const handleGroupClick = () => {
+    navigate("/view-group"); 
+  };
+
   return (
     <div className="w-96 h-[28rem] bg-[#492e16] p-4 flex flex-col items-center justify-between relative">
       <img src="logo.png" className="w-34 mx-auto" alt="Logo" />
 
-      <div className="bg-[#3a2312] px-3 py-1 rounded-md shadow-md">
-        <p className="text-white text-xs font-semibold">
-          {user ? `👤 ${user}` : "Guest"}
-        </p>
+      <div className="flex space-x-7 w-full">
+        <div className="bg-[#3a2312] px-3 py-1 rounded-md shadow-md flex-1">
+          <p className="text-white text-xs font-semibold">
+            {user ? `👤 ${user}` : "Guest"}
+          </p>
+        </div>
+
+        <div className="bg-[#3a2312] px-3 py-1 rounded-md shadow-md flex-1 hover:cursor-pointer" onClick={handleGroupClick}>
+          <p className="text-white text-xs font-semibold">
+            {group ? `👤 ${group}` : "No Group"}
+          </p>
+        </div>
       </div>
 
       <p className="text-white text-lg text-center">
@@ -68,8 +89,8 @@ function Popup() {
         <img
           src="coffecup.png"
           alt="Coffee Cup"
-          className="w-full h-full object-cover"
-          onClick={state.running ? handleStopWithWarning : handleStart}
+          className="w-full h-full object-cover hover:cursor-pointer"
+          onClick={state.running ? handleStopWithWarning : handleClockIn}
         />
       </div>
 

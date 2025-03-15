@@ -23,7 +23,7 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     endTime = message.endTime;
     running = message.running;
 
-    chrome.storage.local.set({ startTime, endTime, running, clickCount: 0, wordCount: 0 });
+    chrome.storage.local.set({ startTime, endTime, running, clickCount: 0, wordCount: 0, block: true });
     chrome.tabs.query({}, (tabs) => {
       for (let tab of tabs) {
         if (tab.id) {
