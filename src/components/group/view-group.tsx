@@ -1,6 +1,6 @@
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../auth/authprovider";
-import { formatTime } from "../../util/formatTime";
+import { formatClockInTime } from "../../util/formatTime";
 
 function ViewGroup() {
     const { group, groupInfo } = useAuth();
@@ -9,15 +9,6 @@ function ViewGroup() {
     const handleGoToTimerStart = () => {
       navigate("/"); 
     };
-  
-    const formatClockInTime = (timestamp: string | number) => {
-        const timestampNumber = typeof timestamp === "string" ? parseInt(timestamp, 10) : timestamp;
-        const clockInDate = new Date(timestampNumber * 1000);
-        const now = Date.now();
-        const timeDifference = now - clockInDate.getTime(); 
-    
-        return formatTime(timeDifference);
-      };
   
     return (
       <div className="w-96 h-[28rem] bg-[#492e16] p-4 flex flex-col items-center justify-between relative">

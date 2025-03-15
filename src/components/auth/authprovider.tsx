@@ -20,6 +20,7 @@ interface AuthContextType {
   logout: () => void;
   clockIn: () => void;
   clockOut: () => void;
+  fetchGroupData: () => void;
   groupInfo: GroupInfo | null;
 }
 
@@ -164,7 +165,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
   }
 
   return (
-    <AuthContext.Provider value={{ user, group, login, logout, clockIn, clockOut, groupInfo}}>
+    <AuthContext.Provider value={{ user, group, login, logout, clockIn, clockOut, groupInfo, fetchGroupData}}>
       {children}
     </AuthContext.Provider>
   );

@@ -10,3 +10,14 @@ export const formatTime = (milliseconds: number) => {
     .padStart(2, "0")}`;
 };
 
+export const formatClockInTime = (clockedInAt: { $date: string } | string) => {
+  const dateString = typeof clockedInAt === "string" ? clockedInAt : clockedInAt.$date;
+  
+  const clockInDate = new Date(dateString);
+  const now = Date.now();
+  const timeDifference = now - clockInDate.getTime();
+
+  return formatTime(timeDifference);
+};
+
+

@@ -9,7 +9,7 @@ function Popup() {
   
   const { state, handleStart, handleStop, setTargetTimeMinutes } = useTimerContext();
   const [showWarning, setShowWarning] = useState(false);
-  const { user, group, clockIn } = useAuth();
+  const { user, group, clockIn, fetchGroupData } = useAuth();
 
   const [clickCount, setClickCount] = useState(0);
   const [wordCount, setWordCount] = useState(0);
@@ -61,6 +61,7 @@ function Popup() {
   };
 
   const handleGroupClick = () => {
+    fetchGroupData;
     navigate("/view-group");
   };
 
