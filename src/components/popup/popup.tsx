@@ -67,7 +67,7 @@ function Popup() {
     <div className="w-96 h-[28rem] bg-[#492e16] p-4 flex flex-col items-center justify-between relative">
       <img src="logo.png" className="w-34 mx-auto" alt="Logo" />
 
-      <div className="flex space-x-7 w-full">
+      <div className="flex space-x-7">
         <div className="bg-[#3a2312] px-3 py-1 rounded-md shadow-md flex-1">
           <p className="text-white text-xs font-semibold">
             {user ? `👤 ${user}` : "Guest"}

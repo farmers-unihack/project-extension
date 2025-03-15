@@ -18,14 +18,24 @@ const Login: React.FC = () => {
     }
   };
 
+  const register = () => {
+    chrome.tabs.create({ url: "https://dejabrew.live/register" }); 
+  };
+
   return (
     <div className="min-h-screen flex items-center justify-center bg-[#492e16] p-4">
       <div className="w-96 h-[28rem] bg-[#492e16] p-4 flex flex-col items-center justify-between relative">
         <img src="logo.png" className="w-34 mx-auto" alt="Logo" />
 
+        <div className="flex space-x-7">
         <div className="bg-[#3a2312] px-3 py-1 rounded-md shadow-md">
           <p className="text-white text-xs font-semibold">Login</p>
         </div>
+
+        <div className="bg-[#3a2312] px-3 py-1 rounded-md shadow-md hover:cursor-pointer" onClick={register}>
+          <p className="text-white text-xs font-semibold">Register</p>
+        </div>
+      </div>
 
         <div className="relative w-36 h-36">
           <img
