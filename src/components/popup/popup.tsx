@@ -60,8 +60,8 @@ function Popup() {
     clockIn();
   };
 
-  const handleGroupClick = () => {
-    fetchGroupData;
+  const handleGroupClick = async () => {
+    await fetchGroupData();
     navigate("/view-group");
   };
 
