@@ -7,7 +7,7 @@ function Popup() {
   const [showWarning, setShowWarning] = useState(false);
 
   const handleIncrement = () => {
-    setTargetTimeMinutes(state.targetTimeMinutes + 1);
+    setTargetTimeMinutes(state.targetTimeMinutes + 5);
   };
 
   const handleDecrement = () => {
