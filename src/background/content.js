@@ -1,17 +1,13 @@
 let clickCount = 0;
 let wordCount = 0;
-setInterval(function () {
-  console.log(clickCount);
-}, 100);
 
 document.addEventListener("click", () => {
-  chrome.runtime.sendMessage({ action: "trackClick", clickCount });
-  clickCount++;
+  clickCount++
+  sendMetrics()
 });
 
 let buffer = "";
-
-document.addEventListener("keydown", (event) => {
+function handlePressedKey(event) {
   if (event.key.length === 1 && /\w/.test(event.key)) {
     buffer += event.key;
   } else if (
@@ -20,55 +16,42 @@ document.addEventListener("keydown", (event) => {
     /[\.,!?;:]/.test(event.key)
   ) {
     if (buffer.trim().length > 0) {
-      console.log("Word detected:", buffer);
-      chrome.runtime.sendMessage({ action: "trackWord", wordCount });
       wordCount++;
     }
     buffer = "";
+    sendMetrics()
   }
-});
+}
 
-let iframeWords = new Map();
-
-function detectGoogleDocsTyping() {
+function injectIFrameBuffer() {
   let iframes = document.querySelectorAll("iframe");
 
   iframes.forEach((iframe) => {
     try {
       if (iframe.contentDocument) {
-        if (!iframeWords.has(iframe)) {
-          iframeWords.set(iframe, "");
-        }
-
-        iframe.contentDocument.addEventListener("keydown", (e) => {
-          let buffer = iframeWords.get(iframe);
-
-          if (e.key.length === 1 && /\w/.test(e.key)) {
-            buffer += e.key;
-          } else if (
-            e.key === " " ||
-            e.key === "Enter" ||
-            /[\.,!?;:]/.test(e.key)
-          ) {
-            if (buffer.trim().length > 0) {
-              console.log("word detected:", buffer);
-              chrome.runtime.sendMessage({ action: "trackWord", wordCount });
-              wordCount++;
-            }
-
-            buffer = "";
-          }
-
-          iframeWords.set(iframe, buffer);
-        });
+        iframe.contentDocument.addEventListener("keydown", (e) => handlePressedKey(e));
       }
     } catch (error) {
+      console.log(error)
       console.log("Cant access iframe");
     }
   });
 }
 
-setTimeout(detectGoogleDocsTyping, 2000);
+async function sendMetrics() {
+  try {
+    await chrome.runtime.sendMessage({
+      action: "update_metrics",
+      clickCount,
+      wordCount
+    });
+  } catch (e) {
+    print(e)
+  }
+}
+
+document.addEventListener("keydown", (event) => handlePressedKey(event));
+setTimeout(injectIFrameBuffer, 2000);
 
 findAllURL = function changeAllURL() {
   var current = window.location.href;

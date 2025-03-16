@@ -16,11 +16,11 @@ interface GroupInfo {
 interface AuthContextType {
   user: string | null;
   group: string | null;
-  login: (username: string, token: string) => void;
-  logout: () => void;
-  clockIn: () => void;
-  clockOut: () => void;
-  fetchGroupData: () => void;
+  login: (username: string, token: string) => Promise<void>;
+  logout: () => Promise<void>;
+  clockIn: () => Promise<void>;
+  clockOut: () => Promise<void>;
+  fetchGroupData: () => Promise<void>;
   groupInfo: GroupInfo | null;
 }
 
@@ -102,7 +102,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
   };
 
 
-  const logout = () => {
+  const logout = async () => {
     localStorage.removeItem("token");
     localStorage.removeItem("username");
     setUser(null);
@@ -128,8 +128,9 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
 
   const clockOut = async () => {
     try {
-      let clickCount = chrome.storage.local.get(["clickCount"]);
-      let wordCount = chrome.storage.local.get(["wordCount"]);
+      let metrics = await chrome.storage.local.get();
+      const clickCount = metrics.clickCount
+      const wordCount = metrics.wordCount
 
       const response = await api.post("/user/clockout", {clickCount, wordCount});
       if (response.status === 200) {

@@ -19,6 +19,8 @@ chrome.runtime.onInstalled.addListener(() => {
 });
 
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
+  console.log(message)
+
   if (message.action === "start") {
     startTime = message.startTime;
     endTime = message.endTime;
@@ -44,21 +46,15 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
       running: false,
       block: false,
     });
-
-    
   } 
-  else if (message.action === "trackWord") {
-    chrome.storage.local.get(["wordCount"], (data) => {
-      let updatedWordCount = (data.wordCount || 0) + 1;
-      chrome.storage.local.set({ wordCount: updatedWordCount });
-    });
+  else if (message.action === "update_metrics") {
+    click = message.clickCount
+    words = message.wordCount
+    chrome.storage.local.set({
+      clickCount: click,
+      wordCount: words
+    })
   } 
-  else if (message.action === "trackClick") {
-    chrome.storage.local.get(["clickCount"], (data) => {
-      let updatedClickCount = (data.clickCount || 0) + 1;
-      chrome.storage.local.set({ clickCount: updatedClickCount });
-    });
-  }
 
   sendResponse({ status: "received" });
   return true;

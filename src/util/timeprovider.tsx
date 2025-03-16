@@ -139,8 +139,10 @@ export const TimeProvider: React.FC<TimeProviderProps> = ({ children }) => {
     }
   };
 
-  const handleStop = () => {
-    chrome.runtime.sendMessage({ action: "stop" });
+  const handleStop = async () => {
+    await clockOut();
+
+    await chrome.runtime.sendMessage({ action: "stop" });
 
     setState({
       startTime: null,
@@ -149,8 +151,6 @@ export const TimeProvider: React.FC<TimeProviderProps> = ({ children }) => {
       targetTimeMinutes: 0,
       timer: 0,
     });
-
-    clockOut();
   };
 
   const handleReset = () => {
