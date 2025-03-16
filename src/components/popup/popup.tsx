@@ -4,12 +4,11 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useTimerContext } from "../../util/timeprovider";
 
-
 function Popup() {
-  
   const { state, handleStart, handleStop, setTargetTimeMinutes } = useTimerContext();
   const [showWarning, setShowWarning] = useState(false);
-  const { user, group, clockIn, fetchGroupData } = useAuth();
+  const [showLogoutConfirmation, setShowLogoutConfirmation] = useState(false);
+  const { user, group, clockIn, fetchGroupData, logout } = useAuth();
 
   const [clickCount, setClickCount] = useState(0);
   const [wordCount, setWordCount] = useState(0);
@@ -32,6 +31,14 @@ function Popup() {
     }
   }, [state.running]);
 
+  useEffect(() => {
+    window.addEventListener("wheel", handleTimeChange);
+
+    return () => {
+      window.removeEventListener("wheel", handleTimeChange);
+    }
+  });
+
   const handleIncrement = () => {
     setTargetTimeMinutes(state.targetTimeMinutes + 5);
   };
@@ -41,6 +48,14 @@ function Popup() {
       setTargetTimeMinutes(state.targetTimeMinutes - 5);
     }
   };
+
+  const handleTimeChange = (event: WheelEvent) => {
+    if (event.shiftKey) {
+      event.preventDefault();
+      const scrollAmount = event.deltaY < 0 ? 1: -1;
+      setTargetTimeMinutes(Math.max(state.targetTimeMinutes + scrollAmount, 0));
+    }
+  }
 
   const handleStopWithWarning = () => {
     setShowWarning(true);
@@ -60,6 +75,19 @@ function Popup() {
     clockIn();
   };
 
+  const confirmLogout = () => {
+    logout();
+    setShowLogoutConfirmation(false);
+  };
+
+  const cancelLogout = () => {
+    setShowLogoutConfirmation(false);
+  };
+
+  const handleUserBoxClick = () => {
+    setShowLogoutConfirmation(true);
+  };
+
   const handleGroupClick = async () => {
     await fetchGroupData();
     navigate("/view-group");
@@ -74,7 +102,10 @@ function Popup() {
       <img src="logo.png" className="w-34 mx-auto" alt="Logo" />
 
       <div className="flex space-x-7 w-full">
-        <div className="bg-[#3a2312] px-3 py-1 rounded-md shadow-md flex-1">
+        <div
+          className="bg-[#3a2312] px-3 py-1 rounded-md shadow-md flex-1 hover:cursor-pointer"
+          onClick={handleUserBoxClick}
+        >
           <p className="text-white text-xs font-semibold">
             {user ? `👤 ${user}` : "Guest"}
           </p>
@@ -156,6 +187,30 @@ function Popup() {
               </button>
               <button
                 onClick={cancelStop}
+                className="px-4 py-2 bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold rounded"
+              >
+                No
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {showLogoutConfirmation && (
+        <div className="absolute inset-0 bg-black/50 flex items-center justify-center">
+          <div className="bg-[#492e16] p-6 rounded-lg shadow-lg border border-white">
+            <p className="text-white text-lg mb-4">
+              Are you sure you want to log out?
+            </p>
+            <div className="flex justify-center space-x-4">
+              <button
+                onClick={confirmLogout}
+                className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white font-bold rounded"
+              >
+                Yes
+              </button>
+              <button
+                onClick={cancelLogout}
                 className="px-4 py-2 bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold rounded"
               >
                 No

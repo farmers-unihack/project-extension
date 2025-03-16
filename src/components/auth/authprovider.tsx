@@ -7,10 +7,12 @@ import {
 } from "react";
 import axios from "axios";
 
+
+
 interface GroupInfo {
-  activeUsers: Array<{username: string; clocked_in_at: string}> | null;
+  activeUsers: Array<{ username: string; clocked_in_at: string }> | null;
   totalTime: number | null;
-  collectibles: any[] | null;
+  collectibles: Array<{id: string}> | null;
 }
 
 interface AuthContextType {
@@ -149,21 +151,20 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
   const fetchGroupData = async () => {
     try {
       const response = await api.get("/group/poll");
-
+  
       if (response.status === 200) {
         const data = response.data;
-        console.log(data);
-
+  
         setGroupInfo({
           activeUsers: data.active_users,
           totalTime: data.total_time_seconds,
           collectibles: data.collectibles,
-        })
+        });
       }
     } catch (error) {
       console.error("Error fetching group data:", error);
     }
-  }
+  };
 
   return (
     <AuthContext.Provider value={{ user, group, login, logout, clockIn, clockOut, groupInfo, fetchGroupData}}>

@@ -4,7 +4,7 @@ function NoGroup() {
   const { user } = useAuth();
 
   const joinGroup = () => {
-    chrome.tabs.create({ url: "https://localhost:5000/prompt" }); 
+    chrome.tabs.create({ url: "https://dejabrew.live/prompt" }); 
   };
 
   return (

@@ -2,42 +2,36 @@ import { useNavigate } from "react-router-dom";
 import { useAuth } from "../auth/authprovider";
 import { formatClockInTime, formatSeconds } from "../../util/formatTime";
 import { useState, useRef, useEffect } from "react";
+import CollectibleComponents from "./collectible";
 
 function ViewGroup() {
   const { group, groupInfo } = useAuth();
   const navigate = useNavigate();
   const [isMenuVisible, setIsMenuVisible] = useState(false);
-  const [menuPosition, setMenuPosition] = useState<{ top: number, left: number }>({ top: 0, left: 0 });
   const menuRef = useRef<HTMLDivElement | null>(null);
-  const collectibleRef = useRef<HTMLImageElement | null>(null);
 
   const handleGoToTimerStart = () => {
     navigate("/");
   };
 
   const handleCollectibleClick = () => {
-    if (collectibleRef.current) {
-      const rect = collectibleRef.current.getBoundingClientRect();
-      setMenuPosition({
-        top: rect.top + rect.height / 2,
-        left: rect.left + rect.width / 2,
-      });
-    }
-    setIsMenuVisible(true); 
+    setIsMenuVisible(true);
   };
 
   const handleCloseMenu = () => {
-    setIsMenuVisible(false); 
+    setIsMenuVisible(false);
   };
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
-        setIsMenuVisible(false); 
+        setIsMenuVisible(false);
       }
     };
 
     document.addEventListener("mousedown", handleClickOutside);
+
+    console.log(groupInfo?.collectibles);
 
     return () => {
       document.removeEventListener("mousedown", handleClickOutside);
@@ -51,11 +45,10 @@ function ViewGroup() {
       <div className="flex items-center justify-between bg-[#3a2312] px-3 py-1 rounded-md shadow-md text-center w-full">
         <div className="w-14 h-13 rounded-md bg-[#2b1a0c] flex items-center justify-center overflow-hidden">
           <img
-            ref={collectibleRef}
             src="collectible_1.png"
             alt="Collectible"
             className="w-10 h-10 object-cover cursor-pointer"
-            onClick={handleCollectibleClick} 
+            onClick={handleCollectibleClick}
           />
         </div>
 
@@ -96,36 +89,22 @@ function ViewGroup() {
       )}
 
       {isMenuVisible && (
-        <div
-          className="fixed inset-0 bg-black/50 bg-opacity-50 flex justify-center items-center z-50"
-          style={{
-            top: `${menuPosition.top}px`,
-            left: `${menuPosition.left}px`,
-            transform: 'translate(-50%, -50%)',
-          }}
-        >
+        <div className="fixed inset-0 bg-black/50 flex justify-center items-center z-50">
           <div
             ref={menuRef}
-            className="bg-black/40 p-6 rounded-md shadow-lg w-68 menu-animating"
-            style={{
-              transformOrigin: 'center',
-              animation: 'slideIn 0.4s ease-out forwards',
-            }}
+            className="bg-black/40 p-6 rounded-md shadow-lg w-80 md:w-96"
           >
-            <h2 className="text-white text-lg font-semibold mb-4">Your Group's Collectibles</h2>
-            <ul className="text-white text-sm">
-              {groupInfo?.collectibles && groupInfo.collectibles.length > 0 ? (
-                groupInfo.collectibles.map((collectible, index) => (
-                  <li key={index} className="mb-2">
-                    {collectible.name} - {collectible.description}
-                  </li>
-                ))
-              ) : (
-                <li>No collectibles available</li>
-              )}
-            </ul>
+            <h2 className="text-white text-lg font-semibold mb-4 text-center">
+              Your Group's Collectibles
+            </h2>
+            <CollectibleComponents
+              collectibleList={
+                groupInfo?.collectibles?.map((collectible) => collectible.id) ||
+                []
+              }
+            />
             <button
-              className="mt-4 text-white bg-[#3a2312] px-4 py-2 rounded-md"
+              className="mt-4 text-white bg-[#3a2312] px-4 py-2 rounded-md w-full"
               onClick={handleCloseMenu}
             >
               Close
