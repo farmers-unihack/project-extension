@@ -20,4 +20,9 @@ export const formatClockInTime = (clockedInAt: { $date: string } | string) => {
   return formatTime(timeDifference);
 };
 
-
+export const formatSeconds = (seconds: number) => {
+  const hours = Math.floor(seconds / 3600);
+  const minutes = Math.floor((seconds % 3600) / 60);
+  const secs = Math.round(seconds % 60);
+  return `${hours}h ${minutes}m ${secs}s`;
+}
