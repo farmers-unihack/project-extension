@@ -51,7 +51,6 @@ function Popup() {
 
   const handleTimeChange = (event: WheelEvent) => {
     if (event.shiftKey) {
-      event.preventDefault();
       const scrollAmount = event.deltaY < 0 ? 1: -1;
       setTargetTimeMinutes(Math.max(state.targetTimeMinutes + scrollAmount, 0));
     }

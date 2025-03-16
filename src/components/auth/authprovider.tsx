@@ -120,11 +120,20 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
       }
     } catch(error: any) {
       console.error("Error during clock-in:", error);
-      if (error.response) {
-        console.error(error.response.data);
-        return error.response.data.msg; 
-      }
-      return "Error during clock-in, please try again later.";
+  // Log full error object
+  if (error.response) {
+    console.error("Response data:", error.response.data);
+    console.error("Response status:", error.response.status);
+    console.error("Response headers:", error.response.headers);
+  } else if (error.request) {
+    // If the error doesn't have a response, check the request
+    console.error("Request data:", error.request);
+  } else {
+    // If it's an error not related to the API request
+    console.error("General Error:", error.message);
+  }
+
+  return error.response?.data?.msg || "Error during clock-in, please try again later.";
     }
   }
 

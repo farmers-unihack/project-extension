@@ -19,25 +19,24 @@ chrome.runtime.onInstalled.addListener(() => {
 });
 
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
-  console.log(message)
-
   if (message.action === "start") {
     startTime = message.startTime;
     endTime = message.endTime;
     running = message.running;
 
     chrome.storage.local.set({ startTime, endTime, running, clickCount: 0, wordCount: 0, block: true });
+
     chrome.tabs.query({}, (tabs) => {
       for (let tab of tabs) {
-        if (tab.id) {
-          chrome.scripting.executeScript({
-            target: { tabId: tab.id },
-            files: ["src/background/content.js"],
+        if (tab.url && !tab.url.startsWith("chrome://") && !tab.url.startsWith("chrome-extension://")) {
+          chrome.tabs.reload(tab.id, () => {
+            if (chrome.runtime.lastError) {
+              console.error("Failed to refresh tab", chrome.runtime.lastError);
+            }
           });
         }
       }
     });
-    
   } 
   else if (message.action === "stop") {
     chrome.storage.local.set({
@@ -48,13 +47,13 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     });
   } 
   else if (message.action === "update_metrics") {
-    click = message.clickCount
-    words = message.wordCount
+    clickCount = message.clickCount;  
+    wordCount = message.wordCount;   
     chrome.storage.local.set({
-      clickCount: click,
-      wordCount: words
-    })
-  } 
+      clickCount: clickCount,
+      wordCount: wordCount
+    });
+  }
 
   sendResponse({ status: "received" });
   return true;
