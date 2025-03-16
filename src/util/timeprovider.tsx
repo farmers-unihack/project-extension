@@ -140,7 +140,7 @@ export const TimeProvider: React.FC<TimeProviderProps> = ({ children }) => {
   };
 
   const handleStop = async () => {
-    await clockOut();
+    await clockOut(state.endTime != null && state.endTime <= Date.now());
 
     await chrome.runtime.sendMessage({ action: "stop" });
 

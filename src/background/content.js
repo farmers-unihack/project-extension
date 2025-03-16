@@ -46,7 +46,7 @@ async function sendMetrics() {
       wordCount
     });
   } catch (e) {
-    print(e)
+    console.log(e)
   }
 }
 

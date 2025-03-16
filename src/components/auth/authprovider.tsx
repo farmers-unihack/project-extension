@@ -19,7 +19,7 @@ interface AuthContextType {
   login: (username: string, token: string) => Promise<void>;
   logout: () => Promise<void>;
   clockIn: () => Promise<void>;
-  clockOut: () => Promise<void>;
+  clockOut: (valid: boolean) => Promise<void>;
   fetchGroupData: () => Promise<void>;
   groupInfo: GroupInfo | null;
 }
@@ -126,13 +126,13 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
     }
   }
 
-  const clockOut = async () => {
+  const clockOut = async (valid: boolean) => {
     try {
       let metrics = await chrome.storage.local.get();
       const clickCount = metrics.clickCount
       const wordCount = metrics.wordCount
 
-      const response = await api.post("/user/clockout", {clickCount, wordCount});
+      const response = await api.post("/user/clockout", {clickCount, wordCount, valid});
       if (response.status === 200) {
         return response.data.msg;
       }
